@@ -226,6 +226,14 @@ class FrontierExplorationMap(TopDownMap):
         for goal in episode.goals:
             sem_scene = self._sim.semantic_annotations()
             object_id = goal.object_id  # type: ignore
+            if isinstance(sem_scene.objects, list):
+                # Objects are a list. If not, they are a dict and object_id needs not to be changed here
+                all_ids = [o.id for o in sem_scene.objects]
+                try:
+                    object_id = all_ids.index(object_id)
+                except:
+                    raise ValueError(f"{object_id} was NOT in the list of objects for semantic scene !")
+            
             assert int(sem_scene.objects[object_id].id.split("_")[-1]) == int(
                 object_id
             ), (
